@@ -1,22 +1,31 @@
-import { Logger } from "@nestjs/common"
+import { Logger, ValidationPipe } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
 import { NestFactory } from "@nestjs/core"
-import * as dotenv from "dotenv"
+import cookieParser from "cookie-parser"
 
 import { AppModule } from "./app.module"
 
 export const LOGGER = new Logger("Auth Service")
 
 async function bootstrap() {
-	dotenv.config()
-
-	const PORT = process.env.PORT ?? 3000
-
 	const app = await NestFactory.create(AppModule)
-	await app.listen(PORT)
 
-	LOGGER.log("------------------------------------")
-	LOGGER.log(`| 🚀 http://localhost:${PORT}/api`)
-	LOGGER.log(`| 🌐 Сервер запущен на порту: ${PORT}`)
-	LOGGER.log("------------------------------------")
+	const config = app.get(ConfigService)
+
+	app.use(cookieParser(config.getOrThrow<string>("COOKIES_SECRET")))
+
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true
+		})
+	)
+
+	app.enableCors({
+		origin: config.getOrThrow<string>("ALLOWED_ORIGIN"),
+		credentials: true,
+		exposedHeaders: ["set-cookie"]
+	})
+
+	await app.listen(config.getOrThrow<number>("PORT"))
 }
 bootstrap()
