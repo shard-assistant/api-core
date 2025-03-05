@@ -1,9 +1,5 @@
 {
-	"hide-files.files": [
-		"node_modules",
-		".cursor",
-		".vscode"
-	],
+	"hide-files.files": ["node_modules", ".cursor", ".vscode", "dist"],
 	"files.exclude": {
 		"**/.git": true,
 		"**/.svn": true,
@@ -13,6 +9,7 @@
 		"**/Thumbs.db": true,
 		"node_modules": true,
 		".cursor": true,
-		".vscode": true
+		".vscode": true,
+		"dist": true
 	}
 }
