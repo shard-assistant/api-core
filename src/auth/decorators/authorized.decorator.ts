@@ -9,4 +9,3 @@ export const Authorized = createParamDecorator(
 		return data ? user && user[data] : user
 	}
 )
-2
