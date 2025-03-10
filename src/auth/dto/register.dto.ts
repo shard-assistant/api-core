@@ -26,7 +26,4 @@ export class RegisterDto {
 	@MinLength(8, { message: "Пароль должен содержать не менее 8 символов" })
 	@Validate(IsPasswordMatchingConstraint)
 	passwordRepeat: string
-
-	@IsEnum(AuthMethod, { message: "Метод аутентификации должен быть валидным" })
-	method: AuthMethod
 }

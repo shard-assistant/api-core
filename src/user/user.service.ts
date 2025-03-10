@@ -34,10 +34,6 @@ export class UserService {
 			}
 		})
 
-		if (!user) {
-			throw new NotFoundException("Пользователь не найден")
-		}
-
 		return user
 	}
 	public async create(

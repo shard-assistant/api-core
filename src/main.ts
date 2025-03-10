@@ -14,6 +14,7 @@ export const LOGGER = new Logger("Auth Service")
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
+	app.setGlobalPrefix("api")
 
 	const config = app.get(ConfigService)
 	const redis = new IORedis(config.getOrThrow<string>("REDIS_URI"))
