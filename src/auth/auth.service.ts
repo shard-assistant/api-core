@@ -9,12 +9,14 @@ import { ConfigService } from "@nestjs/config"
 import { AuthMethod, User } from "@prisma/__generated__"
 import { verify } from "argon2"
 import { Request, Response } from "express"
+import { use } from "react"
 
 import { PrismaService } from "@/prisma/prisma.service"
 import { UserService } from "@/user/user.service"
 
 import { LoginDto } from "./dto/login.dto"
 import { RegisterDto } from "./dto/register.dto"
+import { EmailConfirmationService } from "./email-confirmation/email-confirmation.service"
 import { ProviderService } from "./provider/provider.service"
 
 @Injectable()
@@ -23,7 +25,8 @@ export class AuthService {
 		private readonly prisma: PrismaService,
 		private readonly userService: UserService,
 		private readonly configService: ConfigService,
-		private readonly providerService: ProviderService
+		private readonly providerService: ProviderService,
+		private readonly emailConfirmationService: EmailConfirmationService
 	) {}
 
 	public async register(req: Request, dto: RegisterDto) {
@@ -40,7 +43,12 @@ export class AuthService {
 			false
 		)
 
-		return this.saveSession(req, newUser)
+		this.emailConfirmationService.sendVerificationToken(newUser)
+
+		return {
+			message:
+				"Для продолжения регистрации подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес."
+		}
 	}
 	public async login(req: Request, dto: LoginDto) {
 		const user = await this.userService.findByEmail(dto.email)
@@ -53,6 +61,13 @@ export class AuthService {
 
 		if (!isPasswordValid) {
 			throw new UnauthorizedException("Неверный email или пароль")
+		}
+
+		if (!user.isVerified) {
+			await this.emailConfirmationService.sendVerificationToken(user)
+			throw new UnauthorizedException(
+				"Для продолжения регистрации подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес."
+			)
 		}
 
 		return this.saveSession(req, user)
