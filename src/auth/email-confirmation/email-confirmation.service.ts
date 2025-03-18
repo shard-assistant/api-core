@@ -5,7 +5,7 @@ import {
 	NotFoundException,
 	forwardRef
 } from "@nestjs/common"
-import { TokenType, User } from "@prisma/__generated__"
+import { TokenType } from "@prisma/__generated__"
 import { Request } from "express"
 import { v4 as uuidv4 } from "uuid"
 
@@ -76,8 +76,8 @@ export class EmailConfirmationService {
 		return this.authService.saveSession(req, existingUser)
 	}
 
-	public async sendVerificationToken(user: User) {
-		const verificationToken = await this.generateVerificationToken(user.email)
+	public async sendVerificationToken(email: string) {
+		const verificationToken = await this.generateVerificationToken(email)
 
 		await this.mailService.sendConfirmationEmail(
 			verificationToken.email,
