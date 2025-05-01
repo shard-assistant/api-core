@@ -169,7 +169,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "F:\\Projects\\shard-assistant\\auth-service-d\\prisma\\__generated__",
+      "value": "F:\\Projects\\shard-assistant\\auth-service\\prisma\\__generated__",
       "fromEnvVar": null
     },
     "config": {
@@ -183,7 +183,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "F:\\Projects\\shard-assistant\\auth-service-d\\prisma\\schema.prisma",
+    "sourceFilePath": "F:\\Projects\\shard-assistant\\auth-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -197,12 +197,11 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "POSTGRES_URI",
-        "value": null
+        "value": "postgresql://postgres:postgres@localhost:5432/assistant"
       }
     }
   },
