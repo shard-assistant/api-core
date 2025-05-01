@@ -1,20 +1,19 @@
+import { NotificationService } from '@/libs/notification/notification.service'
+import { PrismaService } from "@/prisma/prisma.service"
 import {
 	BadRequestException,
 	Injectable,
 	NotFoundException
 } from "@nestjs/common"
-import { TokenType, User } from "@prisma/__generated__"
-
-import { MailService } from "@/libs/mail/mail.service"
-import { PrismaService } from "@/prisma/prisma.service"
+import { TokenType } from "@prisma/__generated__"
 
 @Injectable()
 export class TwoFactorAuthService {
 	public constructor(
 		private readonly prisma: PrismaService,
-		private readonly mailService: MailService
+		private readonly notificationService: NotificationService
 	) {}
-
+ 
 	public async validateTwoFactorToken(email: string, code: string) {
 		const existingToken = await this.prisma.token.findFirst({
 			where: {
@@ -56,9 +55,10 @@ export class TwoFactorAuthService {
 	public async sendTwoFactorToken(email: string) {
 		const twoFactorToken = await this.generateTwoFactorToken(email)
 
-		await this.mailService.sendTwoFactorTokenEmail(
-			twoFactorToken.email,
-			twoFactorToken.token
+		await this.notificationService
+			.sendNotification("mail", twoFactorToken.email, 'tf_auth', { 
+				code: twoFactorToken.token 
+			}
 		)
 
 		return true

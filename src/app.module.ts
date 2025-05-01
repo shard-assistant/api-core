@@ -7,10 +7,9 @@ import { PasswordRecoveryModule } from "./auth/password-recovery/password-recove
 import { ProviderModule } from "./auth/provider/provider.module"
 import { TwoFactorAuthModule } from "./auth/two-factor-auth/two-factor-auth.module"
 import { IS_DEV_ENV } from "./libs/common/utils/is-dev.util"
-import { MailModule } from "./libs/mail/mail.module"
+import { NotificationModule } from "./libs/notification/notification.module"
 import { PrismaModule } from "./prisma/prisma.module"
 import { UserModule } from "./user/user.module"
-
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -21,10 +20,10 @@ import { UserModule } from "./user/user.module"
 		AuthModule,
 		UserModule,
 		ProviderModule,
-		MailModule,
 		EmailConfirmationModule,
 		PasswordRecoveryModule,
-		TwoFactorAuthModule
+		TwoFactorAuthModule,
+		NotificationModule
 	]
 })
 export class AppModule {}
