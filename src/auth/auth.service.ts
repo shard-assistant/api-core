@@ -40,6 +40,8 @@ export class AuthService {
 		const newUser = await this.userService.create(
 			dto.email,
 			dto.password,
+			dto.name,
+			"",
 			AuthMethod.CREDENTIALS,
 			false
 		)
@@ -118,6 +120,8 @@ export class AuthService {
 			(await this.userService.create(
 				profile.email,
 				"",
+				profile.name,
+				profile.picture,
 				AuthMethod[profile.provider.toUpperCase()],
 				true
 			))

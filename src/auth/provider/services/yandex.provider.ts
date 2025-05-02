@@ -17,7 +17,10 @@ export class YandexOAuthProvider extends BaseOAuthService {
 
 	public async extractUserInfo(data: YandexProfile): Promise<UserInfoType> {
 		return super.extractUserInfo({
-			email: data.emails[0]
+			email: data.emails[0],
+			name: data.display_name,
+			picture: data.default_avatar_id
+				? `https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/islands-200` : undefined
 		})
 	}
 }

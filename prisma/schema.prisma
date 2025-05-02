@@ -15,14 +15,17 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  email     String   @unique
-  password  String
+  email    String @unique
+  password String
 
-  role      UserRole @default(REGULAR)
+  displayName String? @map("display_name")
+  picture     String?
 
-  isVerified Boolean @default(false) @map("is_verified")
+  role UserRole @default(REGULAR)
+
+  isVerified         Boolean @default(false) @map("is_verified")
   isTwoFactorEnabled Boolean @default(false) @map("is_two_factor_enabled")
 
   method AuthMethod
@@ -36,31 +39,31 @@ model User {
 }
 
 model Account {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  type String
+  type     String
   provider String
 
   refreshToken String? @map("refresh_token")
-  accessToken String? @map("access_token")
-  expiresAt Int @map("expires_at")
+  accessToken  String? @map("access_token")
+  expiresAt    Int     @map("expires_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User? @relation(fields: [userId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id])
   userId String? @map("user_id")
 
   @@map("accounts")
 }
 
 model Token {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  email String
-  token String @unique
-  type TokenType
-  expiresIn DateTime @map("expires_in")
+  email     String
+  token     String    @unique
+  type      TokenType
+  expiresIn DateTime  @map("expires_in")
 
   createdAt DateTime @default(now()) @map("created_at")
 
