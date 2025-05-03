@@ -173,7 +173,7 @@ exports.UserRole = exports.$Enums.UserRole = {
 
 exports.AuthMethod = exports.$Enums.AuthMethod = {
   CREDENTIALS: 'CREDENTIALS',
-  GOOGLE: 'GOOGLE',
+  GITHUB: 'GITHUB',
   YANDEX: 'YANDEX'
 };
 

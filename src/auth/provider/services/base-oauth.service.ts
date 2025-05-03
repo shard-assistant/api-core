@@ -14,7 +14,7 @@ export class BaseOAuthService {
 
 	public constructor(private readonly options: BaseProviderOptionsType) {}
 
-	protected async extractUserInfo(data: any): Promise<UserInfoType> {
+	protected async extractUserInfo(data: any, accessToken?: string): Promise<UserInfoType> {
 		return {
 			...data,
 			provider: this.options.name
@@ -84,7 +84,7 @@ export class BaseOAuthService {
 		}
 
 		const user = await userResponse.json()
-		const userData = await this.extractUserInfo(user)
+		const userData = await this.extractUserInfo(user, tokenData.access_token)
 
 		return {
 			...userData,

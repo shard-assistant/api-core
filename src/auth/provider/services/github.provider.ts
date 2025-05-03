@@ -15,13 +15,24 @@ export class GithubOAuthProvider extends BaseOAuthService {
 		})
 	}
 
-	public async extractUserInfo(data: GithubProfile): Promise<UserInfoType> {
+	public async extractUserInfo(data: GithubProfile, accessToken: string): Promise<UserInfoType> {
+		const emailResponse = await fetch("https://api.github.com/user/emails", {
+			headers: {
+				Authorization: `Bearer ${accessToken}`
+			}
+		})
+
+		const emails = await emailResponse.json() as {email: string, primary: boolean}[]
+
+		const email = emails.find((email) => email.primary)?.email
+
 		return super.extractUserInfo({
-			email: data.email,
-			name: data.name || data.login,
+			email: data.email || email,
+			name: data.login,
 			picture: data.avatar_url
 		})
 	}
+	
 }
 
 interface GithubProfile extends Record<string, any> {
