@@ -7,10 +7,11 @@ import { TokenType } from "@prisma/__generated__"
 import { hash } from "argon2"
 import { v4 as uuidv4 } from "uuid"
 
-import { MailService } from "@/libs/mail/mail.service"
 import { PrismaService } from "@/prisma/prisma.service"
 import { UserService } from "@/user/user.service"
 
+import { NotificationService } from '@/libs/notification/notification.service'
+import { ConfigService } from '@nestjs/config'
 import { NewPasswordDto } from "./dto/new-password.dto"
 import { ResetPasswordDto } from "./dto/reset-password.dto"
 
@@ -19,7 +20,8 @@ export class PasswordRecoveryService {
 	public constructor(
 		private readonly prisma: PrismaService,
 		private readonly userService: UserService,
-		private readonly mailService: MailService
+		private readonly configService: ConfigService,
+		private readonly notificationService: NotificationService
 	) {}
 
 	public async resetPassword(dto: ResetPasswordDto) {
@@ -35,9 +37,13 @@ export class PasswordRecoveryService {
 			existingUser.email
 		)
 
-		await this.mailService.sendResetPasswordEmail(
-			passwordResetToken.email,
-			passwordResetToken.token
+		const domain = this.configService.getOrThrow<string>("ALLOWED_ORIGIN")
+		const resetLink = `${domain}/auth/new-password?token=${passwordResetToken.token}`
+
+		await this.notificationService
+			.sendNotification("mail", passwordResetToken.email, 'reset_password', { 
+				resetLink
+			}
 		)
 
 		return true

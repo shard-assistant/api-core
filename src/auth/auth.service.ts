@@ -40,6 +40,8 @@ export class AuthService {
 		const newUser = await this.userService.create(
 			dto.email,
 			dto.password,
+			dto.name,
+			"",
 			AuthMethod.CREDENTIALS,
 			false
 		)
@@ -55,13 +57,13 @@ export class AuthService {
 		const user = await this.userService.findByEmail(dto.email)
 
 		if (!user || !dto.password) {
-			throw new NotFoundException("Пользователь не найден")
+			throw new NotFoundException("Неверный email или пароль")
 		}
 
 		const isPasswordValid = await verify(user.password, dto.password)
 
 		if (!isPasswordValid) {
-			throw new UnauthorizedException("Неверный email или пароль")
+			throw new NotFoundException("Неверный email или пароль")
 		}
 
 		if (!user.isVerified) {
@@ -118,6 +120,8 @@ export class AuthService {
 			(await this.userService.create(
 				profile.email,
 				"",
+				profile.name,
+				profile.picture,
 				AuthMethod[profile.provider.toUpperCase()],
 				true
 			))

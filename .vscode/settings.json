@@ -1,5 +1,15 @@
 {
-	"hide-files.files": ["node_modules", ".cursor", ".vscode", "dist"],
+	"hide-files.files": [
+		"node_modules",
+		".cursor",
+		".vscode",
+		"dist",
+		"tsconfig.build.json",
+		"yarn.lock",
+		"nest-cli.json",
+		"docker-compose.yaml",
+		"prisma/__generated__"
+	],
 	"files.exclude": {
 		"**/.git": true,
 		"**/.svn": true,
@@ -7,9 +17,18 @@
 		"**/CVS": true,
 		"**/.DS_Store": true,
 		"**/Thumbs.db": true,
+		"**/.expo": true,
+		"**/.expo-shared": true,
+		"**/.idea": true,
+		"**/.nuxt": true,
 		"node_modules": true,
 		".cursor": true,
 		".vscode": true,
-		"dist": true
+		"dist": true,
+		"tsconfig.build.json": true,
+		"yarn.lock": true,
+		"nest-cli.json": true,
+		"docker-compose.yaml": true,
+		"prisma/__generated__": true
 	}
 }

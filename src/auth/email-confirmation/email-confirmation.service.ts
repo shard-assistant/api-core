@@ -9,22 +9,24 @@ import { TokenType } from "@prisma/__generated__"
 import { Request } from "express"
 import { v4 as uuidv4 } from "uuid"
 
-import { MailService } from "@/libs/mail/mail.service"
 import { PrismaService } from "@/prisma/prisma.service"
 import { UserService } from "@/user/user.service"
 
 import { AuthService } from "../auth.service"
 
+import { NotificationService } from '@/libs/notification/notification.service'
+import { ConfigService } from '@nestjs/config'
 import { ConfirmationDto } from "./dto/confirmation.dto"
 
 @Injectable()
 export class EmailConfirmationService {
 	public constructor(
 		private readonly prisma: PrismaService,
-		private readonly mailService: MailService,
 		private readonly userService: UserService,
 		@Inject(forwardRef(() => AuthService))
-		private readonly authService: AuthService
+		private readonly authService: AuthService,
+		private readonly configService: ConfigService,
+		private readonly notificationService: NotificationService
 	) {}
 
 	public async newVerification(req: Request, dto: ConfirmationDto) {
@@ -79,9 +81,13 @@ export class EmailConfirmationService {
 	public async sendVerificationToken(email: string) {
 		const verificationToken = await this.generateVerificationToken(email)
 
-		await this.mailService.sendConfirmationEmail(
-			verificationToken.email,
-			verificationToken.token
+		const domain = this.configService.getOrThrow<string>("ALLOWED_ORIGIN")
+		const confirmLink = `${domain}/auth/new-verification?token=${verificationToken.token}`
+
+		await this.notificationService
+			.sendNotification("mail", verificationToken.email, 'reg_confirmation', { 
+				confirmLink
+			}
 		)
 
 		return true
