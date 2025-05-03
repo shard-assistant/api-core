@@ -57,13 +57,13 @@ export class AuthService {
 		const user = await this.userService.findByEmail(dto.email)
 
 		if (!user || !dto.password) {
-			throw new NotFoundException("Пользователь не найден")
+			throw new NotFoundException("Неверный email или пароль")
 		}
 
 		const isPasswordValid = await verify(user.password, dto.password)
 
 		if (!isPasswordValid) {
-			throw new UnauthorizedException("Неверный email или пароль")
+			throw new NotFoundException("Неверный email или пароль")
 		}
 
 		if (!user.isVerified) {
