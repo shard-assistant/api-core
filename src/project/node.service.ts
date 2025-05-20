@@ -6,8 +6,6 @@ import {
 import { Node } from "@prisma/__generated__"
 import { PrismaService } from "src/prisma/prisma.service"
 
-import { ProjectService } from "../project.service"
-
 import { defaultNodes } from "./config/nodes.config"
 import { CreateConnectionDto } from "./dto/create-connection.dto"
 import { CreateNodeDto } from "./dto/create-node.dto"
@@ -15,10 +13,7 @@ import { UpdateNodeDto } from "./dto/update-node.dto"
 
 @Injectable()
 export class NodeService {
-	constructor(
-		private readonly prisma: PrismaService,
-		private readonly projectService: ProjectService
-	) {}
+	constructor(private readonly prisma: PrismaService) {}
 
 	create(data: CreateNodeDto) {
 		if (!this.validateType(data.type)) {
@@ -71,7 +66,20 @@ export class NodeService {
 		})
 	}
 
-	createConnection(projectId: string, data: CreateConnectionDto) {
+	setStorage(id: string, storage: any) {
+		return this.prisma.node.update({
+			where: {
+				id
+			},
+			data: {
+				storage
+			}
+		})
+	}
+
+	async createConnection(projectId: string, data: CreateConnectionDto) {
+		await this.validateConnection(data)
+
 		return this.prisma.connection.create({
 			data: {
 				sourceNodeId: data.sourceNodeId,
@@ -91,20 +99,35 @@ export class NodeService {
 		})
 	}
 
-	findConnectionsByProjectId(projectId: string) {
-		return this.prisma.connection.findMany({
+	findConnectionsByNodeIdAndPortId(nodeId: string, portId: string) {
+		return this.prisma.connection.findFirst({
 			where: {
-				projectId
+				targetNodeId: nodeId,
+				targetPort: portId
 			}
 		})
 	}
 
 	validateType(type: string) {
-		return defaultNodes.some((node) => node.id === type)
+		return type in defaultNodes
+	}
+
+	async validateConnection(data: CreateConnectionDto) {
+		const connection = await this.findConnectionsByNodeIdAndPortId(
+			data.sourceNodeId,
+			data.sourcePort
+		)
+
+		if (connection) throw new BadRequestException("Connection already exists")
 	}
 
 	async validateUserAccessNode(userId: string, node: Node) {
-		const project = await this.projectService.findById(node.projectId, userId)
+		const project = await this.prisma.project.findUnique({
+			where: {
+				id: node.projectId,
+				userId
+			}
+		})
 
 		if (!project) throw new NotFoundException("Project not found")
 

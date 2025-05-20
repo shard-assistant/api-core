@@ -14,12 +14,11 @@ import {
 import { Authorization } from "@/auth/decorators/auth.decorator"
 import { Authorized } from "@/auth/decorators/authorized.decorator"
 
-import { ProjectService } from "../project.service"
-
 import { CreateConnectionDto } from "./dto/create-connection.dto"
 import { CreateNodeDto } from "./dto/create-node.dto"
 import { UpdateNodeDto } from "./dto/update-node.dto"
 import { NodeService } from "./node.service"
+import { ProjectService } from "./project.service"
 
 @Controller("nodes")
 @Authorization()

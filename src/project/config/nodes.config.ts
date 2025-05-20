@@ -1,4 +1,4 @@
-export const defaultNodes: INode[] = [
+export const defaultNodesList: INode[] = [
 	{
 		id: "text",
 		displayName: "Текстовое поле",
@@ -47,3 +47,15 @@ export const defaultNodes: INode[] = [
 		outputPorts: []
 	}
 ]
+
+export const defaultNodes = defaultNodesList.reduce(
+	(acc, node) => {
+		acc[node.id] = node
+		return acc
+	},
+	{} as Record<string, INode>
+)
+
+export function findNodeConfigById(id: string) {
+	return defaultNodes[id]
+}

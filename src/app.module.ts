@@ -9,7 +9,6 @@ import { TwoFactorAuthModule } from "./auth/two-factor-auth/two-factor-auth.modu
 import { IS_DEV_ENV } from "./libs/common/utils/is-dev.util"
 import { NotificationModule } from "./libs/notification/notification.module"
 import { PrismaModule } from "./prisma/prisma.module"
-import { NodeModule } from "./project/node/node.module"
 import { ProjectModule } from "./project/project.module"
 import { UserModule } from "./user/user.module"
 
@@ -27,8 +26,7 @@ import { UserModule } from "./user/user.module"
 		PasswordRecoveryModule,
 		TwoFactorAuthModule,
 		NotificationModule,
-		ProjectModule,
-		NodeModule
+		ProjectModule
 	]
 })
 export class AppModule {}
