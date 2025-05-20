@@ -1,13 +1,17 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, NotFoundException } from "@nestjs/common"
 
 import { PrismaService } from "../prisma/prisma.service"
 
 import { CreateProjectDto } from "./dto/create-project.dto"
 import { UpdateProjectDto } from "./dto/update-project.dto"
+import { NodeService } from "./node/node.service"
 
 @Injectable()
 export class ProjectService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly nodeService: NodeService
+	) {}
 
 	create(userId: string, data: CreateProjectDto) {
 		return this.prisma.project.create({
@@ -54,5 +58,19 @@ export class ProjectService {
 				userId
 			}
 		})
+	}
+
+	async findConnections(projectId: string, userId: string) {
+		await this.validateUserAccess(userId, projectId)
+
+		return this.nodeService.findConnectionsByProjectId(projectId)
+	}
+
+	async validateUserAccess(userId: string, projectId: string) {
+		const project = await this.findById(projectId, userId)
+
+		if (!project) throw new NotFoundException("Project not found")
+
+		return true
 	}
 }
