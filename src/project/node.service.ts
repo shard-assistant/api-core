@@ -1,0 +1,142 @@
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException
+} from "@nestjs/common"
+import { Node } from "@prisma/__generated__"
+import { PrismaService } from "src/prisma/prisma.service"
+
+import { defaultNodes } from "./config/nodes.config"
+import { CreateConnectionDto } from "./dto/create-connection.dto"
+import { CreateNodeDto } from "./dto/create-node.dto"
+import { UpdateNodeDto } from "./dto/update-node.dto"
+
+@Injectable()
+export class NodeService {
+	constructor(private readonly prisma: PrismaService) {}
+
+	create(data: CreateNodeDto) {
+		if (!this.validateType(data.type)) {
+			throw new BadRequestException("Invalid node type")
+		}
+
+		return this.prisma.node.create({
+			data: {
+				type: data.type,
+				storage: data.storage,
+				position: data.position,
+				projectId: data.projectId
+			}
+		})
+	}
+
+	findByProjectId(projectId: string) {
+		return this.prisma.node.findMany({
+			where: {
+				projectId
+			}
+		})
+	}
+
+	findById(id: string) {
+		return this.prisma.node.findUnique({
+			where: {
+				id
+			}
+		})
+	}
+
+	update(id: string, data: UpdateNodeDto) {
+		return this.prisma.node.update({
+			where: {
+				id
+			},
+			data: {
+				storage: data.storage,
+				position: data.position
+			}
+		})
+	}
+
+	remove(id: string) {
+		return this.prisma.node.delete({
+			where: {
+				id
+			}
+		})
+	}
+
+	setStorage(id: string, storage: any) {
+		return this.prisma.node.update({
+			where: {
+				id
+			},
+			data: {
+				storage
+			}
+		})
+	}
+
+	async createConnection(projectId: string, data: CreateConnectionDto) {
+		await this.validateConnection(data)
+
+		return this.prisma.connection.create({
+			data: {
+				sourceNodeId: data.sourceNodeId,
+				targetNodeId: data.targetNodeId,
+				sourcePort: data.sourcePort,
+				targetPort: data.targetPort,
+				projectId
+			}
+		})
+	}
+
+	removeConnection(id: string) {
+		return this.prisma.connection.delete({
+			where: {
+				id
+			}
+		})
+	}
+
+	findConnectionsByNodeIdAndPortId(nodeId: string, portId: string) {
+		return this.prisma.connection.findFirst({
+			where: {
+				targetNodeId: nodeId,
+				targetPort: portId
+			}
+		})
+	}
+
+	validateType(type: string) {
+		return type in defaultNodes
+	}
+
+	async validateConnection(data: CreateConnectionDto) {
+		const connection = await this.findConnectionsByNodeIdAndPortId(
+			data.sourceNodeId,
+			data.sourcePort
+		)
+
+		if (connection) throw new BadRequestException("Connection already exists")
+	}
+
+	async validateUserAccessNode(userId: string, node: Node) {
+		const project = await this.prisma.project.findUnique({
+			where: {
+				id: node.projectId,
+				userId
+			}
+		})
+
+		if (!project) throw new NotFoundException("Project not found")
+
+		return true
+	}
+
+	async validateUserAccessNodeId(userId: string, nodeId: string) {
+		const node = await this.findById(nodeId)
+
+		return this.validateUserAccessNode(userId, node)
+	}
+}
