@@ -1,10 +1,10 @@
 import { Connection, Node } from "@prisma/__generated__"
 
-import { findNodeConfigById, inputNodeTypes } from "../config/nodes.config"
-import { NodeHandler } from "../types/node-handler"
-import { RuntimeNode } from "../types/node.types"
+import { findNodeConfigById, inputNodeTypes } from "./config/nodes.config"
+import { NodeHandler } from "./types/node-handler"
+import { RuntimeNode } from "./types/node.types"
 
-export class ProjectRunIterator {
+export class GraphExecutor {
 	nodes: Map<string, RuntimeNode>
 	connections: Connection[]
 	handlerMap: Map<string, NodeHandler<any, any>>

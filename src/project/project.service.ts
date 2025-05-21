@@ -4,10 +4,10 @@ import { PrismaService } from "../prisma/prisma.service"
 
 import { CreateProjectDto } from "./dto/create-project.dto"
 import { UpdateProjectDto } from "./dto/update-project.dto"
+import { GraphExecutor } from "./graph-executor"
 import { AINodeHandler } from "./handlers/ai-node.handler"
 import { DisplayNodeHandler } from "./handlers/display-node.handler"
 import { TextNodeHandler } from "./handlers/text-node.handler"
-import { ProjectRunIterator } from "./interpreter/project-run.iterator"
 import { NodeHandler } from "./types/node-handler"
 
 @Injectable()
@@ -90,7 +90,6 @@ export class ProjectService {
 	}
 
 	async run(projectId: string) {
-		// Получаем все ноды и соединения проекта
 		const [nodes, connections] = await Promise.all([
 			this.prisma.node.findMany({
 				where: { projectId }
@@ -100,11 +99,7 @@ export class ProjectService {
 			})
 		])
 
-		const runIterator = new ProjectRunIterator(
-			nodes,
-			connections,
-			this.handlerMap
-		)
+		const runIterator = new GraphExecutor(nodes, connections, this.handlerMap)
 
 		while (runIterator.hasNext()) {
 			await runIterator.next()
