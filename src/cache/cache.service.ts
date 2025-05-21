@@ -20,8 +20,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 	async saveIteration(projectId: string, results: Record<string, any>) {
 		const iterationId = cuid()
 		const key = `iteration:${projectId}:${iterationId}`
+		const timestamp = Date.now()
 
-		await this.redis.set(key, JSON.stringify(results))
+		await this.redis.set(key, JSON.stringify({ ...results, timestamp }))
 		await this.redis.expire(key, 60 * 60 * 24) // Хранить 24 часа
 
 		return iterationId
@@ -51,13 +52,16 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 				if (!data) return null
 
 				const iterationId = key.split(":")[2]
+				const parsed = JSON.parse(data)
+				const { timestamp, ...results } = parsed
 				return {
 					iterationId,
-					results: JSON.parse(data)
+					timestamp,
+					results
 				}
 			})
 		)
 
-		return iterations.filter(Boolean)
+		return iterations.filter(Boolean).sort((a, b) => b.timestamp - a.timestamp)
 	}
 }
