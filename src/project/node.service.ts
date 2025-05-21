@@ -6,27 +6,14 @@ import {
 import { Node } from "@prisma/__generated__"
 import { PrismaService } from "src/prisma/prisma.service"
 
-import {
-	defaultNodes,
-	findNodeConfigById,
-	registeredNodeTypes
-} from "./config/nodes.config"
+import { defaultNodes } from "./config/nodes.config"
 import { CreateConnectionDto } from "./dto/create-connection.dto"
 import { CreateNodeDto } from "./dto/create-node.dto"
 import { UpdateNodeDto } from "./dto/update-node.dto"
-import { AINodeHandler } from "./handlers/ai-node.handler"
-import { DisplayNodeHandler } from "./handlers/display-node.handler"
-import { TextNodeHandler } from "./handlers/text-node.handler"
-import { NodeTypes } from "./types/node.types"
 
 @Injectable()
 export class NodeService {
-	constructor(
-		private readonly prisma: PrismaService,
-		private readonly textNodeHandler: TextNodeHandler,
-		private readonly aiNodeHandler: AINodeHandler,
-		private readonly displayNodeHandler: DisplayNodeHandler
-	) {}
+	constructor(private readonly prisma: PrismaService) {}
 
 	create(data: CreateNodeDto) {
 		if (!this.validateType(data.type)) {
