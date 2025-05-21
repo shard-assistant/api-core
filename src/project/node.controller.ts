@@ -14,7 +14,7 @@ import {
 import { Authorization } from "@/auth/decorators/auth.decorator"
 import { Authorized } from "@/auth/decorators/authorized.decorator"
 
-import { registeredNodeTypes } from "./config/nodes.config"
+import { defaultNodes } from "./config/nodes.config"
 import { CreateConnectionDto } from "./dto/create-connection.dto"
 import { CreateNodeDto } from "./dto/create-node.dto"
 import { UpdateNodeDto } from "./dto/update-node.dto"
@@ -42,7 +42,7 @@ export class NodeController {
 	@Get("types")
 	@HttpCode(HttpStatus.OK)
 	async types() {
-		return registeredNodeTypes
+		return Object.values(defaultNodes)
 	}
 
 	@Get(":id")
