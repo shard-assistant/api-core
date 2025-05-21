@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
 
+import { CacheService } from "../cache/cache.service"
 import { PrismaService } from "../prisma/prisma.service"
 
 import { CreateProjectDto } from "./dto/create-project.dto"
@@ -15,6 +16,7 @@ export class ProjectService {
 	handlerMap: Map<string, NodeHandler<any, any>> = new Map()
 	constructor(
 		private readonly prisma: PrismaService,
+		private readonly cacheService: CacheService,
 		readonly textNodeHandler: TextNodeHandler,
 		readonly aiNodeHandler: AINodeHandler,
 		readonly displayNodeHandler: DisplayNodeHandler
@@ -99,13 +101,13 @@ export class ProjectService {
 			})
 		])
 
-		const runIterator = new GraphExecutor(nodes, connections, this.handlerMap)
+		const executor = new GraphExecutor(nodes, connections, this.handlerMap)
 
-		while (runIterator.hasNext()) {
-			await runIterator.next()
+		while (executor.hasNext()) {
+			await executor.next()
 		}
 
-		const result = Array.from(runIterator.nodes.values()).reduce(
+		const result = Array.from(executor.nodes.values()).reduce(
 			(acc, node) => ({
 				...acc,
 				[node.id]: node.output
@@ -113,6 +115,25 @@ export class ProjectService {
 			{}
 		)
 
-		return result
+		const iterationId = await this.cacheService.saveIteration(projectId, result)
+
+		return {
+			iterationId,
+			results: result
+		}
+	}
+
+	async getIterationResults(projectId: string, iterationId: string) {
+		const results = await this.cacheService.getIteration(projectId, iterationId)
+
+		if (!results) {
+			throw new NotFoundException("Результаты итерации не найдены")
+		}
+
+		return results
+	}
+
+	async getAllIterations(projectId: string) {
+		return this.cacheService.getAllIterations(projectId)
 	}
 }

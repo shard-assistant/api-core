@@ -152,34 +152,4 @@ export class NodeService {
 
 		return this.validateUserAccessNode(userId, node)
 	}
-
-	async runNode(node: Node) {
-		if (!this.validateType(node.type)) {
-			throw new BadRequestException(`Invalid node type: ${node.type}`)
-		}
-
-		const nodeType = node.type as NodeTypes
-		const config = findNodeConfigById(nodeType)
-		if (!config) {
-			throw new BadRequestException(
-				`Handler for node type ${nodeType} not found`
-			)
-		}
-
-		switch (nodeType) {
-			case "text":
-				await this.textNodeHandler.run(node.id)
-				break
-			case "ai":
-				await this.aiNodeHandler.run(node.id)
-				break
-			case "display":
-				await this.displayNodeHandler.run(node.id)
-				break
-			default:
-				throw new BadRequestException(
-					`Handler for node type ${nodeType} not implemented`
-				)
-		}
-	}
 }

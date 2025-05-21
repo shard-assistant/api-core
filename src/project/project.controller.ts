@@ -55,4 +55,32 @@ export class ProjectController {
 	remove(@Param("id") id: string, @Authorized("id") userId: string) {
 		return this.projectService.remove(id, userId)
 	}
+
+	@Post(":id/run")
+	@HttpCode(HttpStatus.OK)
+	async run(@Param("id") id: string, @Authorized("id") userId: string) {
+		await this.projectService.validateUserAccess(userId, id)
+		return this.projectService.run(id)
+	}
+
+	@Get(":id/iterations/:iterationId")
+	@HttpCode(HttpStatus.OK)
+	async getIterationResults(
+		@Param("id") id: string,
+		@Param("iterationId") iterationId: string,
+		@Authorized("id") userId: string
+	) {
+		await this.projectService.validateUserAccess(userId, id)
+		return this.projectService.getIterationResults(id, iterationId)
+	}
+
+	@Get(":id/iterations")
+	@HttpCode(HttpStatus.OK)
+	async getAllIterations(
+		@Param("id") id: string,
+		@Authorized("id") userId: string
+	) {
+		await this.projectService.validateUserAccess(userId, id)
+		return this.projectService.getAllIterations(id)
+	}
 }
