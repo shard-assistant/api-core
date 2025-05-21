@@ -4,10 +4,25 @@ import { PrismaService } from "../prisma/prisma.service"
 
 import { CreateProjectDto } from "./dto/create-project.dto"
 import { UpdateProjectDto } from "./dto/update-project.dto"
+import { AINodeHandler } from "./handlers/ai-node.handler"
+import { DisplayNodeHandler } from "./handlers/display-node.handler"
+import { TextNodeHandler } from "./handlers/text-node.handler"
+import { ProjectRunIterator } from "./interpreter/project-run.iterator"
+import { NodeHandler } from "./types/node-handler"
 
 @Injectable()
 export class ProjectService {
-	constructor(private readonly prisma: PrismaService) {}
+	handlerMap: Map<string, NodeHandler<any, any>> = new Map()
+	constructor(
+		private readonly prisma: PrismaService,
+		readonly textNodeHandler: TextNodeHandler,
+		readonly aiNodeHandler: AINodeHandler,
+		readonly displayNodeHandler: DisplayNodeHandler
+	) {
+		this.handlerMap.set(textNodeHandler.config.id, textNodeHandler)
+		this.handlerMap.set(aiNodeHandler.config.id, aiNodeHandler)
+		this.handlerMap.set(displayNodeHandler.config.id, displayNodeHandler)
+	}
 
 	create(userId: string, data: CreateProjectDto) {
 		return this.prisma.project.create({
@@ -72,5 +87,37 @@ export class ProjectService {
 		if (!project) throw new NotFoundException("Project not found")
 
 		return true
+	}
+
+	async run(projectId: string) {
+		// Получаем все ноды и соединения проекта
+		const [nodes, connections] = await Promise.all([
+			this.prisma.node.findMany({
+				where: { projectId }
+			}),
+			this.prisma.connection.findMany({
+				where: { projectId }
+			})
+		])
+
+		const runIterator = new ProjectRunIterator(
+			nodes,
+			connections,
+			this.handlerMap
+		)
+
+		while (runIterator.hasNext()) {
+			await runIterator.next()
+		}
+
+		const result = Array.from(runIterator.nodes.values()).reduce(
+			(acc, node) => ({
+				...acc,
+				[node.id]: node.output
+			}),
+			{}
+		)
+
+		return result
 	}
 }

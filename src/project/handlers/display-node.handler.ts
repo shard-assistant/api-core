@@ -5,18 +5,23 @@ import { NodeService } from "../node.service"
 import { NodeHandler } from "../types/node-handler"
 import { RuntimeNode } from "../types/node.types"
 
+type DisplayStorage = {
+	displayFormat: "text" | "json" | "html"
+}
+
 @Injectable()
-export class TextNodeHandler extends NodeHandler<string, string> {
+export class DisplayNodeHandler extends NodeHandler<DisplayStorage, undefined> {
 	constructor(readonly nodeService: NodeService) {
 		super(nodeService)
-
-		this.config = findNodeConfigById("text")
+		this.config = findNodeConfigById("display")
 	}
 
 	async run(
 		node: RuntimeNode,
-		_: (nodeId: string, portId: string) => any
-	): Promise<string> {
-		return node.storage || ""
+		findSourcePortData: (nodeId: string, portId: string) => any
+	): Promise<any> {
+		const data = findSourcePortData(node.id, "data")
+
+		return data
 	}
 }

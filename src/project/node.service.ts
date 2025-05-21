@@ -6,14 +6,27 @@ import {
 import { Node } from "@prisma/__generated__"
 import { PrismaService } from "src/prisma/prisma.service"
 
-import { defaultNodes } from "./config/nodes.config"
+import {
+	defaultNodes,
+	findNodeConfigById,
+	registeredNodeTypes
+} from "./config/nodes.config"
 import { CreateConnectionDto } from "./dto/create-connection.dto"
 import { CreateNodeDto } from "./dto/create-node.dto"
 import { UpdateNodeDto } from "./dto/update-node.dto"
+import { AINodeHandler } from "./handlers/ai-node.handler"
+import { DisplayNodeHandler } from "./handlers/display-node.handler"
+import { TextNodeHandler } from "./handlers/text-node.handler"
+import { NodeTypes } from "./types/node.types"
 
 @Injectable()
 export class NodeService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly textNodeHandler: TextNodeHandler,
+		private readonly aiNodeHandler: AINodeHandler,
+		private readonly displayNodeHandler: DisplayNodeHandler
+	) {}
 
 	create(data: CreateNodeDto) {
 		if (!this.validateType(data.type)) {
@@ -138,5 +151,35 @@ export class NodeService {
 		const node = await this.findById(nodeId)
 
 		return this.validateUserAccessNode(userId, node)
+	}
+
+	async runNode(node: Node) {
+		if (!this.validateType(node.type)) {
+			throw new BadRequestException(`Invalid node type: ${node.type}`)
+		}
+
+		const nodeType = node.type as NodeTypes
+		const config = findNodeConfigById(nodeType)
+		if (!config) {
+			throw new BadRequestException(
+				`Handler for node type ${nodeType} not found`
+			)
+		}
+
+		switch (nodeType) {
+			case "text":
+				await this.textNodeHandler.run(node.id)
+				break
+			case "ai":
+				await this.aiNodeHandler.run(node.id)
+				break
+			case "display":
+				await this.displayNodeHandler.run(node.id)
+				break
+			default:
+				throw new BadRequestException(
+					`Handler for node type ${nodeType} not implemented`
+				)
+		}
 	}
 }

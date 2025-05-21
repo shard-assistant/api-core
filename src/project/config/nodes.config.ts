@@ -1,5 +1,10 @@
-export const defaultNodesList: INode[] = [
-	{
+import { INode, NodeTypes } from "../types/node.types"
+
+export const registeredNodeTypes = ["text", "ai", "display"] as const
+export const inputNodeTypes = ["text"]
+
+export const defaultNodes: Record<NodeTypes, INode> = {
+	text: {
 		id: "text",
 		displayName: "Текстовое поле",
 		inputPorts: [],
@@ -11,7 +16,7 @@ export const defaultNodesList: INode[] = [
 			}
 		]
 	},
-	{
+	ai: {
 		id: "ai",
 		displayName: "Искусственный интеллект",
 		inputPorts: [
@@ -34,7 +39,7 @@ export const defaultNodesList: INode[] = [
 			}
 		]
 	},
-	{
+	display: {
 		id: "display",
 		displayName: "Отображение",
 		inputPorts: [
@@ -46,16 +51,8 @@ export const defaultNodesList: INode[] = [
 		],
 		outputPorts: []
 	}
-]
+} as const
 
-export const defaultNodes = defaultNodesList.reduce(
-	(acc, node) => {
-		acc[node.id] = node
-		return acc
-	},
-	{} as Record<string, INode>
-)
-
-export function findNodeConfigById(id: string) {
-	return defaultNodes[id]
+export function findNodeConfigById(id: NodeTypes): INode {
+	return defaultNodes[id] as INode
 }
