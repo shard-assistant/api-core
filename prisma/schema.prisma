@@ -61,7 +61,7 @@ model Node {
 
   type     String
   storage  Json
-  position String
+  position Json
 
   projectId String @map("project_id")
 

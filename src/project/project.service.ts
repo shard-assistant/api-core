@@ -48,6 +48,10 @@ export class ProjectService {
 			where: {
 				id,
 				userId
+			},
+			include: {
+				nodes: true,
+				connections: true
 			}
 		})
 	}

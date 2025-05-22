@@ -1,17 +1,17 @@
-import { IsNotEmpty, IsString } from "class-validator"
+import { IsNotEmpty, IsObject, IsString } from "class-validator"
 
 export class CreateNodeDto {
 	@IsString()
 	@IsNotEmpty()
 	type: string
 
-	@IsString()
+	@IsObject()
 	@IsNotEmpty()
-	storage: string
+	storage: Record<string, any>
 
-	@IsString()
+	@IsObject()
 	@IsNotEmpty()
-	position: string
+	position: { x: number; y: number }
 
 	@IsString()
 	@IsNotEmpty()
