@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common"
 
+import { AiModule } from "@/ai/ai.module"
 import { CacheModule } from "@/cache/cache.module"
 import { UserModule } from "@/user/user.module"
 
@@ -12,7 +13,7 @@ import { ProjectController } from "./project.controller"
 import { ProjectService } from "./project.service"
 
 @Module({
-	imports: [UserModule, CacheModule],
+	imports: [UserModule, CacheModule, AiModule],
 	controllers: [ProjectController, NodeController],
 	providers: [
 		ProjectService,
