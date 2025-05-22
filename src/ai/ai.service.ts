@@ -42,11 +42,11 @@ export class AiService {
 					messages: [
 						{
 							role: "system",
-							content: prompt
+							text: prompt
 						},
 						{
 							role: "user",
-							content: data
+							text: data
 						}
 					]
 				})
