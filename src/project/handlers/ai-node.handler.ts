@@ -37,9 +37,7 @@ export class AINodeHandler extends NodeHandler<
 			maxTokens: node.storage.maxTokens
 		}
 
-		const response = await (
-			await this.aiService.fetchPrompt(prompt, request, settings)
-		).json()
+		const response = await this.aiService.fetchPrompt(prompt, request, settings)
 
 		return { response: response.result.alternatives[0].message.text }
 	}
