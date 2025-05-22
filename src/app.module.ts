@@ -12,6 +12,8 @@ import { NotificationModule } from "./libs/notification/notification.module"
 import { PrismaModule } from "./prisma/prisma.module"
 import { ProjectModule } from "./project/project.module"
 import { UserModule } from "./user/user.module"
+import { AiService } from './ai/ai.service';
+import { AiModule } from './ai/ai.module';
 
 @Module({
 	imports: [
@@ -28,7 +30,9 @@ import { UserModule } from "./user/user.module"
 		TwoFactorAuthModule,
 		NotificationModule,
 		ProjectModule,
-		CacheModule
-	]
+		CacheModule,
+		AiModule
+	],
+	providers: [AiService]
 })
 export class AppModule {}

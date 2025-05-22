@@ -1,5 +1,8 @@
 import { Injectable } from "@nestjs/common"
 
+import { AiService } from "@/ai/ai.service"
+import { PromptSettings } from "@/ai/types/ai.types"
+
 import { findNodeConfigById } from "../config/nodes.config"
 import { NodeService } from "../node.service"
 import { NodeHandler } from "../types/node-handler"
@@ -12,7 +15,10 @@ export class AINodeHandler extends NodeHandler<
 		response: string
 	}
 > {
-	constructor(readonly nodeService: NodeService) {
+	constructor(
+		readonly nodeService: NodeService,
+		readonly aiService: AiService
+	) {
 		super(nodeService)
 		this.config = findNodeConfigById("ai")
 	}
@@ -24,8 +30,17 @@ export class AINodeHandler extends NodeHandler<
 		const prompt = findSourcePortData(node.id, "prompt")
 		const request = findSourcePortData(node.id, "request")
 
-		const response = `AI Response to: ${request}\nUsing prompt: ${prompt}`
+		const settings: PromptSettings = {
+			token: node.storage.token,
+			catalog: node.storage.catalog,
+			temperature: node.storage.temperature,
+			maxTokens: node.storage.maxTokens
+		}
 
-		return { response }
+		const response = await (
+			await this.aiService.fetchPrompt(prompt, request, settings)
+		).json()
+
+		return { response: response.result.alternatives[0].message.text }
 	}
 }
