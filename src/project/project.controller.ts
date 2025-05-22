@@ -12,6 +12,7 @@ import {
 
 import { Authorization } from "@/auth/decorators/auth.decorator"
 import { Authorized } from "@/auth/decorators/authorized.decorator"
+import { TaskStatus } from "@/cache/cache.service"
 
 import { CreateProjectDto } from "./dto/create-project.dto"
 import { UpdateProjectDto } from "./dto/update-project.dto"
@@ -63,24 +64,13 @@ export class ProjectController {
 		return this.projectService.run(id)
 	}
 
-	@Get(":id/iterations/:iterationId")
+	@Get(":id/status")
 	@HttpCode(HttpStatus.OK)
-	async getIterationResults(
-		@Param("id") id: string,
-		@Param("iterationId") iterationId: string,
-		@Authorized("id") userId: string
-	) {
-		await this.projectService.validateUserAccess(userId, id)
-		return this.projectService.getIterationResults(id, iterationId)
-	}
-
-	@Get(":id/iterations")
-	@HttpCode(HttpStatus.OK)
-	async getAllIterations(
+	async getTaskStatus(
 		@Param("id") id: string,
 		@Authorized("id") userId: string
-	) {
+	): Promise<TaskStatus> {
 		await this.projectService.validateUserAccess(userId, id)
-		return this.projectService.getAllIterations(id)
+		return this.projectService.getTaskStatus(id)
 	}
 }

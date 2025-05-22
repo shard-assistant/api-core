@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
 
+import { TaskStatus } from "@/cache/cache.service"
+
 import { CacheService } from "../cache/cache.service"
 import { PrismaService } from "../prisma/prisma.service"
 
@@ -96,48 +98,51 @@ export class ProjectService {
 	}
 
 	async run(projectId: string) {
-		const [nodes, connections] = await Promise.all([
-			this.prisma.node.findMany({
-				where: { projectId }
-			}),
-			this.prisma.connection.findMany({
-				where: { projectId }
-			})
-		])
+		await this.cacheService.createTask(projectId)
 
-		const executor = new GraphExecutor(nodes, connections, this.handlerMap)
+		// Запускаем выполнение в фоне
+		this.runAsync(projectId).catch(console.error)
 
-		while (executor.hasNext()) {
-			await executor.next()
-		}
+		return { projectId }
+	}
 
-		const result = Array.from(executor.nodes.values()).reduce(
-			(acc, node) => ({
-				...acc,
-				[node.id]: node.output
-			}),
-			{}
-		)
+	private async runAsync(projectId: string) {
+		try {
+			const [nodes, connections] = await Promise.all([
+				this.prisma.node.findMany({
+					where: { projectId }
+				}),
+				this.prisma.connection.findMany({
+					where: { projectId }
+				})
+			])
 
-		const iterationId = await this.cacheService.saveIteration(projectId, result)
+			const executor = new GraphExecutor(nodes, connections, this.handlerMap)
 
-		return {
-			iterationId,
-			results: result
+			while (executor.hasNext()) {
+				await executor.next()
+			}
+
+			const result = Array.from(executor.nodes.values()).reduce(
+				(acc, node) => ({
+					...acc,
+					[node.id]: node.output
+				}),
+				{}
+			)
+
+			await this.cacheService.completeTask(projectId, result)
+		} catch (error) {
+			await this.cacheService.failTask(projectId, error.message)
+			throw error
 		}
 	}
 
-	async getIterationResults(projectId: string, iterationId: string) {
-		const results = await this.cacheService.getIteration(projectId, iterationId)
-
-		if (!results) {
-			throw new NotFoundException("Результаты итерации не найдены")
+	async getTaskStatus(projectId: string): Promise<TaskStatus> {
+		const status = await this.cacheService.getTaskStatus(projectId)
+		if (!status) {
+			throw new NotFoundException("Задача не найдена")
 		}
-
-		return results
-	}
-
-	async getAllIterations(projectId: string) {
-		return this.cacheService.getAllIterations(projectId)
+		return status
 	}
 }
