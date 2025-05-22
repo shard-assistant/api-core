@@ -1,12 +1,11 @@
-import { IsNotEmpty } from "class-validator"
-import { IsString } from "class-validator"
+import { IsNotEmpty, IsObject } from "class-validator"
 
 export class UpdateNodeDto {
-	@IsString()
+	@IsObject()
 	@IsNotEmpty()
-	storage: string
+	storage: Record<string, any>
 
-	@IsString()
+	@IsObject()
 	@IsNotEmpty()
-	position: string
+	position: { x: number; y: number }
 }
