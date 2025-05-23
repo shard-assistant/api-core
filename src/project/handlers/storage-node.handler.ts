@@ -7,15 +7,15 @@ import { RuntimeNode } from "../types/node.types"
 
 const LOGGER = new Logger("DisplayNodeHandler")
 
-type DisplayStorage = {
-	displayFormat: "text" | "json" | "html"
+type StorageStorage = {
+	storage: string[]
 }
 
 @Injectable()
-export class DisplayNodeHandler extends NodeHandler<DisplayStorage, undefined> {
+export class StorageNodeHandler extends NodeHandler<StorageStorage, undefined> {
 	constructor(readonly nodeService: NodeService) {
 		super(nodeService)
-		this.config = findNodeConfigById("display")
+		this.config = findNodeConfigById("storage")
 	}
 
 	async run(
@@ -26,10 +26,9 @@ export class DisplayNodeHandler extends NodeHandler<DisplayStorage, undefined> {
 			dataType: string
 		) => any
 	): Promise<any> {
-		const data = findSourcePortData(node.id, "data", "any")
+		const data = findSourcePortData(node.id, "add", "string")
+		const storage: string[] = node.storage || []
 
-		return {
-			output: data
-		}
+		this.nodeService.setStorage(node.id, [...storage, data])
 	}
 }

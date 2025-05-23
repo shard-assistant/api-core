@@ -10,6 +10,9 @@ import { UpdateProjectDto } from "./dto/update-project.dto"
 import { GraphExecutor } from "./graph-executor"
 import { AINodeHandler } from "./handlers/ai-node.handler"
 import { DisplayNodeHandler } from "./handlers/display-node.handler"
+import { IteratorHandler } from "./handlers/iterator.handler"
+import { StorageNodeHandler } from "./handlers/storage-node.handler"
+import { TelegramMessageImportHandler } from "./handlers/telegram-message-import.handler"
 import { TextNodeHandler } from "./handlers/text-node.handler"
 import { NodeHandler } from "./types/node-handler"
 
@@ -21,11 +24,20 @@ export class ProjectService {
 		private readonly cacheService: CacheService,
 		readonly textNodeHandler: TextNodeHandler,
 		readonly aiNodeHandler: AINodeHandler,
-		readonly displayNodeHandler: DisplayNodeHandler
+		readonly displayNodeHandler: DisplayNodeHandler,
+		readonly telegramMessageImportHandler: TelegramMessageImportHandler,
+		readonly iteratorHandler: IteratorHandler,
+		readonly storageNodeHandler: StorageNodeHandler
 	) {
 		this.handlerMap.set(textNodeHandler.config.id, textNodeHandler)
 		this.handlerMap.set(aiNodeHandler.config.id, aiNodeHandler)
 		this.handlerMap.set(displayNodeHandler.config.id, displayNodeHandler)
+		this.handlerMap.set(
+			telegramMessageImportHandler.config.id,
+			telegramMessageImportHandler
+		)
+		this.handlerMap.set(iteratorHandler.config.id, iteratorHandler)
+		this.handlerMap.set(storageNodeHandler.config.id, storageNodeHandler)
 	}
 
 	create(userId: string, data: CreateProjectDto) {

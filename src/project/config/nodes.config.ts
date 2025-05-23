@@ -1,7 +1,14 @@
 import { INode, NodeTypes } from "../types/node.types"
 
-export const registeredNodeTypes = ["text", "ai", "display"] as const
-export const inputNodeTypes = ["text"]
+export const registeredNodeTypes = [
+	"text",
+	"ai",
+	"display",
+	"telegramMessageImport",
+	"iterator",
+	"storage"
+] as const
+export const inputNodeTypes = ["text", "telegramMessageImport"]
 
 export const defaultNodes: Record<NodeTypes, INode> = {
 	text: {
@@ -46,6 +53,48 @@ export const defaultNodes: Record<NodeTypes, INode> = {
 			{
 				id: "data",
 				displayName: "данные",
+				dataType: "any"
+			}
+		],
+		outputPorts: []
+	},
+	telegramMessageImport: {
+		id: "telegramMessageImport",
+		displayName: "Импорт сообщений из Telegram",
+		inputPorts: [],
+		outputPorts: [
+			{
+				id: "messages",
+				displayName: "сообщения",
+				dataType: "array"
+			}
+		]
+	},
+	iterator: {
+		id: "iterator",
+		displayName: "Обход массива",
+		inputPorts: [
+			{
+				id: "data",
+				displayName: "массив",
+				dataType: "array"
+			}
+		],
+		outputPorts: [
+			{
+				id: "response",
+				displayName: "элемент массива",
+				dataType: "any"
+			}
+		]
+	},
+	storage: {
+		id: "storage",
+		displayName: "Хранилище",
+		inputPorts: [
+			{
+				id: "add",
+				displayName: "добавить",
 				dataType: "string"
 			}
 		],

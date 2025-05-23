@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, Logger } from "@nestjs/common"
 
 import { AiService } from "@/ai/ai.service"
 import { PromptSettings } from "@/ai/types/ai.types"
@@ -7,6 +7,8 @@ import { findNodeConfigById } from "../config/nodes.config"
 import { NodeService } from "../node.service"
 import { NodeHandler } from "../types/node-handler"
 import { RuntimeNode } from "../types/node.types"
+
+const LOGGER = new Logger("AINodeHandler")
 
 @Injectable()
 export class AINodeHandler extends NodeHandler<
@@ -25,10 +27,14 @@ export class AINodeHandler extends NodeHandler<
 
 	async run(
 		node: RuntimeNode,
-		findSourcePortData: (nodeId: string, portId: string) => any
+		findSourcePortData: (
+			nodeId: string,
+			portId: string,
+			dataType: string
+		) => any
 	) {
-		const prompt = findSourcePortData(node.id, "prompt")
-		const request = findSourcePortData(node.id, "request")
+		const prompt = findSourcePortData(node.id, "prompt", "string")
+		const request = findSourcePortData(node.id, "request", "string")
 
 		const settings: PromptSettings = {
 			token: node.storage.token,
@@ -43,9 +49,15 @@ export class AINodeHandler extends NodeHandler<
 				request,
 				settings
 			)
-			return { response: response.result.alternatives[0].message.text }
+			return {
+				output: { response: response.result.alternatives[0].message.text },
+				runtimeStorage: {}
+			}
 		} catch (error) {
-			return { response: error.message }
+			return {
+				output: { response: error.message },
+				runtimeStorage: {}
+			}
 		}
 	}
 }

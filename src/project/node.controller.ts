@@ -29,6 +29,12 @@ export class NodeController {
 		private readonly projectService: ProjectService
 	) {}
 
+	@Get("types")
+	@HttpCode(HttpStatus.OK)
+	async types() {
+		return Object.values(defaultNodes)
+	}
+
 	@Post()
 	@HttpCode(HttpStatus.CREATED)
 	async create(@Authorized("id") userId: string, @Body() data: CreateNodeDto) {
@@ -37,12 +43,6 @@ export class NodeController {
 		if (!project) throw new NotFoundException("Project not found")
 
 		return this.nodeService.create(data)
-	}
-
-	@Get("types")
-	@HttpCode(HttpStatus.OK)
-	async types() {
-		return Object.values(defaultNodes)
 	}
 
 	@Get(":id")
