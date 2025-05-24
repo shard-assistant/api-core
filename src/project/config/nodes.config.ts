@@ -5,8 +5,11 @@ export const registeredNodeTypes = [
 	"ai",
 	"display",
 	"telegramMessageImport",
+	"telegramMessageSend",
 	"iterator",
-	"storage"
+	"storage",
+	"importJson",
+	"equal"
 ] as const
 export const inputNodeTypes = ["text", "telegramMessageImport"]
 
@@ -70,6 +73,28 @@ export const defaultNodes: Record<NodeTypes, INode> = {
 			}
 		]
 	},
+	telegramMessageSend: {
+		id: "telegramMessageSend",
+		displayName: "Отправка сообщения в Telegram",
+		inputPorts: [
+			{
+				id: "send",
+				displayName: "отправить",
+				dataType: "any"
+			},
+			{
+				id: "message",
+				displayName: "сообщение",
+				dataType: "string"
+			},
+			{
+				id: "chatId",
+				displayName: "id чата",
+				dataType: "string"
+			}
+		],
+		outputPorts: []
+	},
 	iterator: {
 		id: "iterator",
 		displayName: "Обход массива",
@@ -99,6 +124,52 @@ export const defaultNodes: Record<NodeTypes, INode> = {
 			}
 		],
 		outputPorts: []
+	},
+	importJson: {
+		id: "importJson",
+		displayName: "Импорт JSON",
+		inputPorts: [
+			{
+				id: "object",
+				displayName: "объект",
+				dataType: "any"
+			}
+		],
+		outputPorts: [
+			{
+				id: "response",
+				displayName: "ответ",
+				dataType: "string"
+			}
+		]
+	},
+	equal: {
+		id: "equal",
+		displayName: "Сравнение",
+		inputPorts: [
+			{
+				id: "goal",
+				displayName: "цель сравнения",
+				dataType: "string"
+			},
+			{
+				id: "value",
+				displayName: "с чем сравнить",
+				dataType: "string"
+			}
+		],
+		outputPorts: [
+			{
+				id: "hasEqual",
+				displayName: "совпадает",
+				dataType: "string"
+			},
+			{
+				id: "hasNotEqual",
+				displayName: "не совпадает",
+				dataType: "string"
+			}
+		]
 	}
 } as const
 

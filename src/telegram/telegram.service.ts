@@ -17,7 +17,6 @@ export class TelegramService {
 
 	async getMessages({
 		botToken,
-		keepUnread = true,
 		offset = 0,
 		limit = 100
 	}: {
@@ -35,16 +34,24 @@ export class TelegramService {
 			(update) => update.message && !update.message.is_read
 		)
 
-		if (!keepUnread) {
-			for (const update of messages) {
-				await this.markAsRead(
-					botToken,
-					update.message.message_id,
-					update.message.chat.id
-				)
-			}
-			return messages
-		}
-		return messages.slice(-limit)
+		if (messages.length <= limit) return messages
+		else return messages.slice(-limit)
+	}
+
+	async sendMessage({
+		botToken,
+		chatId,
+		message
+	}: {
+		botToken: string
+		chatId: string
+		message: string
+	}) {
+		const baseUrl = `https://api.telegram.org/bot${botToken}`
+		await fetch(`${baseUrl}/sendMessage`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ chat_id: chatId, text: message })
+		})
 	}
 }

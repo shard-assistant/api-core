@@ -29,7 +29,7 @@ export class IteratorHandler extends NodeHandler<
 	) {
 		let data = []
 		if (!node.runtimeStorage.data) {
-			data = findSourcePortData(node.id, "data", "array")
+			data = [...findSourcePortData(node.id, "data", "array")]
 			if (!Array.isArray(data)) {
 				switch (typeof data) {
 					case "string":

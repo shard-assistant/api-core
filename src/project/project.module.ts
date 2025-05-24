@@ -7,9 +7,12 @@ import { UserModule } from "@/user/user.module"
 
 import { AINodeHandler } from "./handlers/ai-node.handler"
 import { DisplayNodeHandler } from "./handlers/display-node.handler"
+import { EqualNodeHandler } from "./handlers/equal-node.handler"
+import { ImportJsonNodeHandler } from "./handlers/import-json-node.handler"
 import { IteratorHandler } from "./handlers/iterator.handler"
 import { StorageNodeHandler } from "./handlers/storage-node.handler"
 import { TelegramMessageImportHandler } from "./handlers/telegram-message-import.handler"
+import { TelegramMessageSendHandler } from "./handlers/telegram-message-send.handler"
 import { TextNodeHandler } from "./handlers/text-node.handler"
 import { NodeController } from "./node.controller"
 import { NodeService } from "./node.service"
@@ -27,7 +30,10 @@ import { ProjectService } from "./project.service"
 		DisplayNodeHandler,
 		TelegramMessageImportHandler,
 		IteratorHandler,
-		StorageNodeHandler
+		StorageNodeHandler,
+		ImportJsonNodeHandler,
+		EqualNodeHandler,
+		TelegramMessageSendHandler
 	],
 	exports: [ProjectService, NodeService]
 })

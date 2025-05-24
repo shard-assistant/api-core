@@ -28,8 +28,22 @@ export class DisplayNodeHandler extends NodeHandler<DisplayStorage, undefined> {
 	): Promise<any> {
 		const data = findSourcePortData(node.id, "data", "any")
 
-		return {
-			output: data
+		try {
+			let response
+			if (!Array.isArray(data)) {
+				switch (typeof data) {
+					case "string":
+						response = JSON.parse(data)
+						break
+				}
+			} else response = data
+			return {
+				output: response
+			}
+		} catch {
+			return {
+				output: "Ошибка при разборе данных"
+			}
 		}
 	}
 }

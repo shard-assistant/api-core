@@ -27,7 +27,8 @@ export abstract class NodeHandler<StorageType, OutputType> {
 			nodeId: string,
 			portId: string,
 			dataType: string
-		) => any
+		) => any,
+		getAndClearSourcePortData: (nodeId: string, portId: string) => any
 	): Promise<{
 		output: OutputType
 		runtimeStorage: any

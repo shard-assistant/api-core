@@ -10,9 +10,12 @@ import { UpdateProjectDto } from "./dto/update-project.dto"
 import { GraphExecutor } from "./graph-executor"
 import { AINodeHandler } from "./handlers/ai-node.handler"
 import { DisplayNodeHandler } from "./handlers/display-node.handler"
+import { EqualNodeHandler } from "./handlers/equal-node.handler"
+import { ImportJsonNodeHandler } from "./handlers/import-json-node.handler"
 import { IteratorHandler } from "./handlers/iterator.handler"
 import { StorageNodeHandler } from "./handlers/storage-node.handler"
 import { TelegramMessageImportHandler } from "./handlers/telegram-message-import.handler"
+import { TelegramMessageSendHandler } from "./handlers/telegram-message-send.handler"
 import { TextNodeHandler } from "./handlers/text-node.handler"
 import { NodeHandler } from "./types/node-handler"
 
@@ -27,7 +30,10 @@ export class ProjectService {
 		readonly displayNodeHandler: DisplayNodeHandler,
 		readonly telegramMessageImportHandler: TelegramMessageImportHandler,
 		readonly iteratorHandler: IteratorHandler,
-		readonly storageNodeHandler: StorageNodeHandler
+		readonly storageNodeHandler: StorageNodeHandler,
+		readonly importJsonNodeHandler: ImportJsonNodeHandler,
+		readonly equalNodeHandler: EqualNodeHandler,
+		readonly telegramMessageSendHandler: TelegramMessageSendHandler
 	) {
 		this.handlerMap.set(textNodeHandler.config.id, textNodeHandler)
 		this.handlerMap.set(aiNodeHandler.config.id, aiNodeHandler)
@@ -38,6 +44,12 @@ export class ProjectService {
 		)
 		this.handlerMap.set(iteratorHandler.config.id, iteratorHandler)
 		this.handlerMap.set(storageNodeHandler.config.id, storageNodeHandler)
+		this.handlerMap.set(importJsonNodeHandler.config.id, importJsonNodeHandler)
+		this.handlerMap.set(equalNodeHandler.config.id, equalNodeHandler)
+		this.handlerMap.set(
+			telegramMessageSendHandler.config.id,
+			telegramMessageSendHandler
+		)
 	}
 
 	create(userId: string, data: CreateProjectDto) {

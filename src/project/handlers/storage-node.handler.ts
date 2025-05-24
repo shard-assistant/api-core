@@ -5,7 +5,7 @@ import { NodeService } from "../node.service"
 import { NodeHandler } from "../types/node-handler"
 import { RuntimeNode } from "../types/node.types"
 
-const LOGGER = new Logger("DisplayNodeHandler")
+const LOGGER = new Logger("StorageNodeHandler")
 
 type StorageStorage = {
 	storage: string[]
@@ -26,9 +26,17 @@ export class StorageNodeHandler extends NodeHandler<StorageStorage, undefined> {
 			dataType: string
 		) => any
 	): Promise<any> {
+		const storage: string[] =
+			node.runtimeStorage.storage || node.storage.data || []
 		const data = findSourcePortData(node.id, "add", "string")
-		const storage: string[] = node.storage || []
 
-		this.nodeService.setStorage(node.id, [...storage, data])
+		await this.nodeService.setStorage(node.id, { data: [...storage, data] })
+
+		return {
+			output: {},
+			runtimeStorage: {
+				storage: [...storage, data]
+			}
+		}
 	}
 }

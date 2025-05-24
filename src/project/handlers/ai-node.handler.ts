@@ -33,17 +33,17 @@ export class AINodeHandler extends NodeHandler<
 			dataType: string
 		) => any
 	) {
-		const prompt = findSourcePortData(node.id, "prompt", "string")
-		const request = findSourcePortData(node.id, "request", "string")
-
-		const settings: PromptSettings = {
-			token: node.storage.token,
-			catalog: node.storage.catalog,
-			temperature: node.storage.temperature,
-			maxTokens: node.storage.maxTokens
-		}
-
 		try {
+			const prompt = findSourcePortData(node.id, "prompt", "string")
+			const request = findSourcePortData(node.id, "request", "string")
+
+			const settings: PromptSettings = {
+				token: node.storage.token,
+				catalog: node.storage.catalog,
+				temperature: node.storage.temperature,
+				maxTokens: node.storage.maxTokens
+			}
+
 			const response = await this.aiService.fetchPrompt(
 				prompt,
 				request,
@@ -56,7 +56,9 @@ export class AINodeHandler extends NodeHandler<
 		} catch (error) {
 			return {
 				output: { response: error.message },
-				runtimeStorage: {}
+				runtimeStorage: {
+					hasNotReady: true
+				}
 			}
 		}
 	}
