@@ -24,6 +24,7 @@ export type RuntimeNode = {
 
 	storage: any
 	output: Record<string, any>
+	runtimeStorage: any
 }
 
 export type NodeTypes = (typeof registeredNodeTypes)[number]

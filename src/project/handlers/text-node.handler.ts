@@ -15,8 +15,11 @@ export class TextNodeHandler extends NodeHandler<string, string> {
 
 	async run(
 		node: RuntimeNode,
-		_: (nodeId: string, portId: string) => any
-	): Promise<string> {
-		return node.storage || ""
+		_: (nodeId: string, portId: string, dataType: string) => any
+	) {
+		return {
+			output: node.storage || "",
+			runtimeStorage: {}
+		}
 	}
 }

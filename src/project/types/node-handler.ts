@@ -1,5 +1,3 @@
-import { Connection } from "@prisma/__generated__"
-
 import { NodeService } from "../node.service"
 
 import { INode, RuntimeNode } from "./node.types"
@@ -25,6 +23,14 @@ export abstract class NodeHandler<StorageType, OutputType> {
 
 	abstract run(
 		node: RuntimeNode,
-		findSourcePortData: (nodeId: string, portId: string) => any
-	): Promise<OutputType>
+		findSourcePortData: (
+			nodeId: string,
+			portId: string,
+			dataType: string
+		) => any,
+		getAndClearSourcePortData: (nodeId: string, portId: string) => any
+	): Promise<{
+		output: OutputType
+		runtimeStorage: any
+	}>
 }

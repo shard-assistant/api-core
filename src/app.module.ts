@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 
+import { AiModule } from "./ai/ai.module"
+import { AiService } from "./ai/ai.service"
 import { AuthModule } from "./auth/auth.module"
 import { EmailConfirmationModule } from "./auth/email-confirmation/email-confirmation.module"
 import { PasswordRecoveryModule } from "./auth/password-recovery/password-recovery.module"
@@ -11,9 +13,8 @@ import { IS_DEV_ENV } from "./libs/common/utils/is-dev.util"
 import { NotificationModule } from "./libs/notification/notification.module"
 import { PrismaModule } from "./prisma/prisma.module"
 import { ProjectModule } from "./project/project.module"
+import { TelegramModule } from "./telegram/telegram.module"
 import { UserModule } from "./user/user.module"
-import { AiService } from './ai/ai.service';
-import { AiModule } from './ai/ai.module';
 
 @Module({
 	imports: [
@@ -31,7 +32,8 @@ import { AiModule } from './ai/ai.module';
 		NotificationModule,
 		ProjectModule,
 		CacheModule,
-		AiModule
+		AiModule,
+		TelegramModule
 	],
 	providers: [AiService]
 })
