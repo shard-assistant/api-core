@@ -94,14 +94,20 @@ export class GraphExecutor {
 				this.findTargetNodesIds(node.id, exclusionPorts).forEach((id) => {
 					this.nextIterationNodes.add(id)
 				})
+			} else if (node.type === "iterator") {
+				if (!runtimeStorage.end) {
+					this.lastIterationNodes.push(node.id)
+				}
+
+				if (output.response !== undefined) {
+					this.findTargetNodesIds(node.id).forEach((id) => {
+						this.nextIterationNodes.add(id)
+					})
+				}
 			} else {
 				this.findTargetNodesIds(node.id).forEach((id) => {
 					this.nextIterationNodes.add(id)
 				})
-
-				if (node.type === "iterator" && !runtimeStorage.end) {
-					this.lastIterationNodes.push(node.id)
-				}
 			}
 		}
 

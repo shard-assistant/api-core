@@ -43,12 +43,12 @@ export class AINodeHandler extends NodeHandler<
 				temperature: node.storage.temperature,
 				maxTokens: node.storage.maxTokens
 			}
-
 			const response = await this.aiService.fetchPrompt(
 				prompt,
 				request,
 				settings
 			)
+
 			return {
 				output: { response: response.result.alternatives[0].message.text },
 				runtimeStorage: {}

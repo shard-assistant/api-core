@@ -41,6 +41,18 @@ export class IteratorHandler extends NodeHandler<
 			}
 		} else data = node.runtimeStorage.data
 
+		if (!data || data.length === 0) {
+			return {
+				output: {
+					response: undefined
+				},
+				runtimeStorage: {
+					data: [],
+					end: true
+				}
+			}
+		}
+
 		const response = data.pop()
 
 		return {
