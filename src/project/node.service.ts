@@ -66,7 +66,7 @@ export class NodeService {
 		})
 	}
 
-	setStorage(id: string, storage: any) {
+	async setStorage(id: string, storage: any) {
 		return this.prisma.node.update({
 			where: {
 				id
