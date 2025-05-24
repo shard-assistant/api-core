@@ -4,6 +4,147 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+generator client {
+  provider = "prisma-client-js"
+  output   = "./__generated__"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URI")
+}
+
+model User {
+  id String @id @default(cuid())
+
+  email    String @unique
+  password String
+
+  displayName String? @map("display_name")
+  picture     String?
+
+  role UserRole @default(REGULAR)
+
+  isVerified         Boolean @default(false) @map("is_verified")
+  isTwoFactorEnabled Boolean @default(false) @map("is_two_factor_enabled")
+
+  method AuthMethod
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  accounts Account[]
+  projects Project[]
+
+  @@map("users")
+}
+
+model Project {
+  id String @id @default(cuid())
+
+  name String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User?  @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  nodes       Node[]
+  connections Connection[]
+
+  @@map("projects")
+}
+
+model Node {
+  id String @id @default(cuid())
+
+  type     String
+  storage  Json
+  position Json
+
+  projectId String @map("project_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project           Project      @relation(fields: [projectId], references: [id])
+  sourceConnections Connection[] @relation("sourceNode")
+  targetConnections Connection[] @relation("targetNode")
+
+  @@map("nodes")
+}
+
+model Connection {
+  id String @id @default(cuid())
+
+  sourceNodeId String @map("source_node_id")
+  targetNodeId String @map("target_node_id")
+
+  sourcePort String @map("source_port")
+  targetPort String @map("target_port")
+
+  projectId String @map("project_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sourceNode Node    @relation("sourceNode", fields: [sourceNodeId], references: [id])
+  targetNode Node    @relation("targetNode", fields: [targetNodeId], references: [id])
+  project    Project @relation(fields: [projectId], references: [id])
+
+  @@map("connections")
+}
+
+model Account {
+  id String @id @default(cuid())
+
+  type     String
+  provider String
+
+  refreshToken String? @map("refresh_token")
+  accessToken  String? @map("access_token")
+  expiresAt    Int?    @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @map("user_id")
+
+  @@map("accounts")
+}
+
+model Token {
+  id String @id @default(cuid())
+
+  email     String
+  token     String    @unique
+  type      TokenType
+  expiresIn DateTime  @map("expires_in")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("tokens")
+}
+
+enum UserRole {
+  REGULAR
+  ADMIN
+}
+
+enum AuthMethod {
+  CREDENTIALS
+  GITHUB
+  YANDEX
+}
+
+enum TokenType {
+  VERIFICATION
+  TWO_FACTOR
+  PASSWORD_RESET
+}
+
 enum PortDirection {
   INPUT
   OUTPUT
